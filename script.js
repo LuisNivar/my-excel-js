@@ -10,10 +10,10 @@ const ROWS = 8
 const COLUNMS = 5;
 
 let selectedColumn = null;
+let selectedRow = null;
 
 let STATE = range(COLUNMS).map(
-    i => range(ROWS).map(
-    () =>({computedValue : 0 , value : 0}))
+    _ => range(ROWS).map(_ =>({computedValue : 0 , value : 0}))
     );
 
 const $table = getElement('.main-table');
@@ -22,11 +22,21 @@ const $body = getElement('.body-table')
 
 // Get td
 $body.addEventListener('click',event =>{
-     const td = event.target.closest('td');
+   
+    const td = event.target.closest('td');
     if(!td) return;
 
-    const col = td.nextElementSibling.dataset.x;
-    if(col <= 0) return
+    const col = [...td.parentNode.children].indexOf(td);
+    if(col <= 0) {   
+        const tr = td.parentNode;
+        const row = [...tr.children];
+
+        removeSelection();
+        tr.classList.add('selected');
+        row.forEach(cell => cell.classList.add("selected"));
+        selectedRow = Number(td.innerText) - 1;
+        return;
+    }
     
      const {x, y} = td.dataset;
      const $input = td.querySelector('input');
@@ -36,7 +46,7 @@ $body.addEventListener('click',event =>{
      const endChar = $input.value.length;
      $input.setSelectionRange(endChar,endChar);
      $input.focus();
-     removeColumnSelection();
+     removeSelection();
 
      // Inputs events
      $input.addEventListener('keydown', event =>{
@@ -57,14 +67,13 @@ $head.addEventListener('click', event => {
     const index = [...th.parentNode.children].indexOf(th);
     // prevent error when click in RowHeaders 
     if(index <= 0 ) return;
-
-    selectedColumn = index - 1; 
     // reset state
-    removeColumnSelection();
+    removeSelection();
 
     const selectedRow = getElements(`tr td:nth-child(${index + 1 })`);
     th.classList.add('selected');
     selectedRow.forEach(el => el.classList.add('selected'));
+    selectedColumn = index - 1; 
 });
 
 document.addEventListener('keydown',(event)=>{
@@ -74,6 +83,14 @@ document.addEventListener('keydown',(event)=>{
         });
         renderTable();
         selectedColumn = null;
+    }
+
+    if(event.key === 'Backspace' && selectedRow !== null){
+        range(COLUNMS).forEach(colmn => {
+            updateCell({x : colmn,  y : selectedRow, value : 0})
+        });
+        renderTable();
+        selectedRow = null;
     }
 });
 
@@ -86,6 +103,16 @@ document.addEventListener('copy',(event)=>{
         event.clipboardData.setData('text/plain',columnValues.join('\n'));
         event.preventDefault();
     }
+
+    if(selectedRow !== null){
+        const rowValues = range(COLUNMS).map(column => {
+            return STATE[column][selectedRow].computedValue;
+        });
+
+        event.clipboardData.setData('text/plain',rowValues.join(';'));
+        event.preventDefault();
+    }
+
 });
 
 document.addEventListener('click',({target})=> {
@@ -93,8 +120,7 @@ document.addEventListener('click',({target})=> {
     const isTdClicked = target.closest('td');
 
     if(!isThClicked && !isTdClicked){
-        removeColumnSelection();
-        selectedColumn = null;
+        removeSelection();
     }
 });
 
@@ -107,8 +133,7 @@ const renderTable = ()=> {
 
     $head.innerHTML = headerHTML;
 
-    //data-tooltip="${STATE[col][row].computedValue}"
-    const bodyHtml = range(ROWS).map(row => {
+    const bodyHtml = range(ROWS).map(row => { 
         return `
         <tr>
             <td>${row + 1}</td>
@@ -183,8 +208,10 @@ const generateConstantsCell = (cols) => {
     }).join('\n');
 }
 
-function removeColumnSelection() {
+function removeSelection() {
     getElements('.selected').forEach(el => el.classList.remove('selected'));
+    selectedColumn = null;
+    selectedRow = null;
 } 
 
 renderTable();
