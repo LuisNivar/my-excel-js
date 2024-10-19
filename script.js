@@ -13,7 +13,7 @@ let selectedColumn = null;
 let selectedRow = null;
 
 let STATE = range(COLUNMS).map(
-    _ => range(ROWS).map(_ =>({computedValue : 0 , value : 0}))
+    _ => range(ROWS).map(_ =>({computedValue : '' , value : 0}))
     );
 
 const $table = getElement('.main-table');
@@ -169,8 +169,11 @@ const updateCell = ({x,y,value}) => {
 
 const computeValue = (value, constants) => {
     const isNumber = typeof(value) === "number";
-    if(isNumber) {return value; }
-
+    const isEmpty = value === 0;
+    
+    if(isEmpty) return '';
+    if(isNumber) return value; 
+    
     const isFormula =  value.startsWith('=') || value.startsWith('+'); 
     if(!isFormula) {return value; }
 
@@ -203,7 +206,9 @@ const generateConstantsCell = (cols) => {
         return rows.map((cell, y)=> {
             const letter = getColumnLetter(x);
             const cellRef = `${letter.toLowerCase()}${y + 1}`; // Like A1, C15...
-            return `const ${cellRef} = ${cell.computedValue};`; // Like const A1 = 15...
+            
+            const computedValue = cell.computedValue === '' ? 0 : cell.computedValue;
+            return `const ${cellRef} = ${computedValue};`; // Like const A1 = 15...
         }).join('\n');
     }).join('\n');
 }
