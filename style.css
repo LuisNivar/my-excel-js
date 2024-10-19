@@ -14,7 +14,7 @@ img {
     border-collapse: collapse;  
 }
 
-.head-table, .main-table tr td:first-child{
+.head-table, .main-table tr td:first-child {
     background-color:  #eee;
 }
 
@@ -30,15 +30,16 @@ img {
     vertical-align: middle;
 }
 
-.main-table th.selected {
+.main-table th.selected,  .main-table tr td.selected:first-child {
     background-color: #19c0cc;
-    outline: 2px solid #19c0cc;
+    border: 1px solid #19c0cc;
     color : white;
+    font-weight: bold;
 }
 
 .main-table td.selected {
     background-color: #e9fbfc;
-    outline: 2px solid #19c0cc;
+    border: 1px solid #19c0cc;
 }
 
 .main-table span, .main-table input {
