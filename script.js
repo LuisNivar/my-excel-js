@@ -23,8 +23,11 @@ const $body = getElement('.body-table')
 // Get td
 $body.addEventListener('click',event =>{
      const td = event.target.closest('td');
-     if(!td) return;
-     
+    if(!td) return;
+
+    const col = td.nextElementSibling.dataset.x;
+    if(col <= 0) return
+    
      const {x, y} = td.dataset;
      const $input = td.querySelector('input');
      const $span = td.querySelector('span');
