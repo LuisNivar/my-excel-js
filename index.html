@@ -13,12 +13,24 @@
     <script type="module" src="modules/constants.js"></script>
     <script type="module" src="script.js"></script>
 </head>
-<body>
-    <img src="/resources/excel-logo.svg" alt="Microsoft Excel logo">
-    <table class="main-table">
-        <thead class="head-table"></head>
-        <tbody class="body-table"></tbody>
-    </table>
-    
+<body> 
+    <main>
+        <header>
+            <span class="logo">
+                <img src="/resources/excel-logo.svg" alt="Microsoft Excel logo">
+                <h1>My Excel Js</h1>
+                <span>WIP</span>
+            </span>
+            <span class="formula-bar">
+                <label for="rows">&#x2A0D</label>
+                <input type="text" readonly name="formula-bar" id="formula-bar">
+            </span>
+        </header>
+
+        <table class="main-table">
+            <thead class="head-table"></head>
+            <tbody class="body-table"></tbody>
+        </table>
+    </main>   
 </body>
 </html>

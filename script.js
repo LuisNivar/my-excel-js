@@ -15,6 +15,7 @@ let STATE = generateState();
 const $table = getElement(".main-table");
 const $head = getElement(".head-table");
 const $body = getElement(".body-table");
+const $formulaBar = getElement("#formula-bar");
 
 // Get td
 $body.addEventListener("click", (event) => {
@@ -30,6 +31,7 @@ $body.addEventListener("click", (event) => {
     tr.classList.add("selected");
     row.forEach((cell) => cell.classList.add("selected"));
     selection.row = Number(td.innerText) - 1;
+    $formulaBar.value = "";
     return;
   }
 
@@ -40,6 +42,8 @@ $body.addEventListener("click", (event) => {
   const endChar = $input.value.length;
   $input.setSelectionRange(endChar, endChar);
   $input.focus();
+  $formulaBar.value = $input.value;
+
   removeSelection();
 
   // Inputs events
@@ -77,6 +81,7 @@ $head.addEventListener("click", (event) => {
   th.classList.add("selected");
   selectedRows.forEach((el) => el.classList.add("selected"));
   selection.column = index - 1;
+  $formulaBar.value = "";
 });
 
 document.addEventListener("keydown", (event) => {
@@ -86,6 +91,7 @@ document.addEventListener("keydown", (event) => {
     });
     renderTable();
     selection.column = null;
+    $formulaBar.value = "";
   }
 
   if (event.key === "Backspace" && selection.row !== null) {
@@ -94,6 +100,7 @@ document.addEventListener("keydown", (event) => {
     });
     renderTable();
     selection.row = null;
+    $formulaBar.value = "";
   }
 });
 
@@ -123,6 +130,7 @@ document.addEventListener("click", ({ target }) => {
 
   if (!isThClicked && !isTdClicked) {
     removeSelection();
+    $formulaBar.value = "";
   }
 });
 
@@ -175,5 +183,12 @@ const updateCell = ({ x, y, value }) => {
 
   renderTable();
 };
+
+// $inputColumns.addEventListener("change", (event) => {
+//   let value = Number(event.target.value);
+//   COLUNMS = value;
+//   renderTable();
+//   //console.log(COLUNMS);
+// });
 
 renderTable();
