@@ -10,8 +10,6 @@ import {
 } from "./modules/helpers.js";
 import { ROWS, COLUNMS, DIAGONAL_ARROW } from "./modules/constants.js";
 
-// let selection.column = null;
-// let selection.row = null;
 let STATE = generateState();
 
 const $table = getElement(".main-table");
@@ -127,15 +125,6 @@ document.addEventListener("click", ({ target }) => {
     removeSelection();
   }
 });
-
-const clickHandler = ({ target }) => {
-  const isThClicked = target.closest("th");
-  const isTdClicked = target.closest("td");
-
-  if (!isThClicked && !isTdClicked) {
-    removeSelection();
-  }
-};
 
 const renderTable = () => {
   const headerHTML = `
