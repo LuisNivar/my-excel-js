@@ -46,10 +46,38 @@ function removeSelection() {
   selection.row = null;
 }
 
+const computeAllCells = (cells, constants) => {
+  cells.forEach((rows, x) => {
+    rows.forEach((cell, y) => {
+      const computedValue = computeValue(cell.value, constants);
+      cell.computedValue = computedValue;
+    });
+  });
+};
+
+const generateConstantsCell = (cols) => {
+  return cols
+    .map((rows, x) => {
+      return rows
+        .map((cell, y) => {
+          const letter = getColumnLetter(x);
+          const cellRef = `${letter.toLowerCase()}${y + 1}`; // Like A1, C15...
+
+          const computedValue =
+            cell.computedValue === "" ? 0 : cell.computedValue;
+          return `const ${cellRef} = ${computedValue};`; // Like const A1 = 15...
+        })
+        .join("\n");
+    })
+    .join("\n");
+};
+
 export {
   generateState,
   getColumnLetter,
   computeValue,
   selection,
   removeSelection,
+  generateConstantsCell,
+  computeAllCells,
 };

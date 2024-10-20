@@ -5,6 +5,8 @@ import {
   computeValue,
   selection,
   removeSelection,
+  generateConstantsCell,
+  computeAllCells,
 } from "./modules/helpers.js";
 import { ROWS, COLUNMS, DIAGONAL_ARROW } from "./modules/constants.js";
 
@@ -126,6 +128,15 @@ document.addEventListener("click", ({ target }) => {
   }
 });
 
+const clickHandler = ({ target }) => {
+  const isThClicked = target.closest("th");
+  const isTdClicked = target.closest("td");
+
+  if (!isThClicked && !isTdClicked) {
+    removeSelection();
+  }
+};
+
 const renderTable = () => {
   const headerHTML = `
     <tr>
@@ -174,32 +185,6 @@ const updateCell = ({ x, y, value }) => {
   STATE = newState;
 
   renderTable();
-};
-
-const computeAllCells = (cells, constants) => {
-  cells.forEach((rows, x) => {
-    rows.forEach((cell, y) => {
-      const computedValue = computeValue(cell.value, constants);
-      cell.computedValue = computedValue;
-    });
-  });
-};
-
-const generateConstantsCell = (cols) => {
-  return cols
-    .map((rows, x) => {
-      return rows
-        .map((cell, y) => {
-          const letter = getColumnLetter(x);
-          const cellRef = `${letter.toLowerCase()}${y + 1}`; // Like A1, C15...
-
-          const computedValue =
-            cell.computedValue === "" ? 0 : cell.computedValue;
-          return `const ${cellRef} = ${computedValue};`; // Like const A1 = 15...
-        })
-        .join("\n");
-    })
-    .join("\n");
 };
 
 renderTable();
