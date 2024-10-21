@@ -22,22 +22,33 @@ $body.addEventListener("click", (event) => {
   const td = event.target.closest("td");
   if (!td) return;
 
-  const col = [...td.parentNode.children].indexOf(td);
-  if (col <= 0) {
-    const tr = td.parentNode;
-    const row = [...tr.children];
+  const tr = td.parentNode;
+  const indexColumn = [...tr.children].indexOf(td);
 
+  if (indexColumn === 0) {
+    const rows = [...tr.children];
     removeSelection();
     tr.classList.add("selected");
-    row.forEach((cell) => cell.classList.add("selected"));
+    rows.forEach((cell) => cell.classList.add("selected"));
     selection.row = Number(td.innerText) - 1;
     $formulaBar.value = "";
     return;
   }
 
+  removeSelection();
+  td.classList.add("selected");
+  const { x, y } = td.dataset;
+  selection.column = x;
+  selection.row = y;
+  $formulaBar.value = STATE[x][y].value;
+});
+
+$body.addEventListener("dblclick", (event) => {
+  const td = event.target.closest("td");
+  if (!td) return;
+
   const { x, y } = td.dataset;
   const $input = td.querySelector("input");
-  const $span = td.querySelector("span");
 
   const endChar = $input.value.length;
   $input.setSelectionRange(endChar, endChar);
@@ -69,23 +80,28 @@ $body.addEventListener("click", (event) => {
 $head.addEventListener("click", (event) => {
   const th = event.target.closest("th");
   if (!th) return;
-  const index = [...th.parentNode.children].indexOf(th);
+  const indexColumn = [...th.parentNode.children].indexOf(th);
 
   // prevent error when click in RowHeaders
-  if (index <= 0) return;
+  if (indexColumn === 0) return;
 
   // reset state
   removeSelection();
 
-  const selectedRows = getElements(`tr td:nth-child(${index + 1})`);
+  const selectedRows = getElements(`tr td:nth-child(${indexColumn + 1})`);
   th.classList.add("selected");
   selectedRows.forEach((el) => el.classList.add("selected"));
-  selection.column = index - 1;
+  selection.column = indexColumn - 1;
   $formulaBar.value = "";
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Backspace" && selection.column !== null) {
+  const isBackSpace = event.key === "Backspace";
+  const isColumnSelected = selection.column !== null && selection.row === null;
+  const isRowSelected = selection.column === null && selection.row !== null;
+  const isCellSelected = !isColumnSelected && !isRowSelected;
+
+  if (isBackSpace && isColumnSelected) {
     range(ROWS).forEach((row) => {
       updateCell({ x: selection.column, y: row, value: 0 });
     });
@@ -94,7 +110,7 @@ document.addEventListener("keydown", (event) => {
     $formulaBar.value = "";
   }
 
-  if (event.key === "Backspace" && selection.row !== null) {
+  if (isBackSpace && isRowSelected) {
     range(COLUNMS).forEach((colmn) => {
       updateCell({ x: colmn, y: selection.row, value: 0 });
     });
@@ -102,10 +118,22 @@ document.addEventListener("keydown", (event) => {
     selection.row = null;
     $formulaBar.value = "";
   }
+
+  if (isBackSpace && isCellSelected) {
+    updateCell({ x: selection.column, y: selection.row, value: 0 });
+    renderTable();
+    selection.column = null;
+    selection.row = null;
+    $formulaBar.value = "";
+  }
 });
 
 document.addEventListener("copy", (event) => {
-  if (selection.column !== null) {
+  const isColumnSelected = selection.column !== null && selection.row === null;
+  const isRowSelected = selection.column === null && selection.row !== null;
+  const isCellSelected = !isColumnSelected && !isRowSelected;
+
+  if (isColumnSelected) {
     const columnValues = range(ROWS).map((row) => {
       return STATE[selection.column][row].computedValue;
     });
@@ -114,12 +142,18 @@ document.addEventListener("copy", (event) => {
     event.preventDefault();
   }
 
-  if (selection.row !== null) {
+  if (isRowSelected) {
     const rowValues = range(COLUNMS).map((column) => {
       return STATE[column][selection.row].computedValue;
     });
 
     event.clipboardData.setData("text/plain", rowValues.join(";"));
+    event.preventDefault();
+  }
+
+  if (isCellSelected) {
+    const cellValue = STATE[selection.column][selection.row].computedValue;
+    event.clipboardData.setData("text/plain", cellValue);
     event.preventDefault();
   }
 });
@@ -183,12 +217,5 @@ const updateCell = ({ x, y, value }) => {
 
   renderTable();
 };
-
-// $inputColumns.addEventListener("change", (event) => {
-//   let value = Number(event.target.value);
-//   COLUNMS = value;
-//   renderTable();
-//   //console.log(COLUNMS);
-// });
 
 renderTable();
