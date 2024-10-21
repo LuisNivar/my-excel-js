@@ -5,18 +5,29 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.table-container {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+}
+
 .main-table {
     border-collapse: collapse;  
-    max-width: fit-content;
+    display: inline-block;
+    width: max-content;
 }
 
-.head-table, .main-table tr td:first-child {
-    background-color:  #eee;
-}
-
-.main-table td:first-child, .main-table th:first-child {
-    max-width: 32px;
+.main-table .body-table td:first-child, .main-table th:first-child {
+    position: sticky;
+    left: 0;
+    width: 32px;
     white-space: nowrap;
+   background-color:  #eee;
+ }
+
+
+.head-table th, .main-table tr td:first-child {
+    background-color:  #eee;
 }
 
 .main-table th, .main-table td {
@@ -29,6 +40,8 @@
     height: 24px;
     position: relative;
     vertical-align: middle;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .main-table th.selected,  .main-table tr td.selected:first-child {
