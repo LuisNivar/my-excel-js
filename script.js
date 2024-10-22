@@ -19,7 +19,7 @@ const $formulaBar = getElement("#formula-bar");
 const $toggleBold = getElement(".bold");
 const $toggleItalic = getElement(".italic");
 
-// Get td
+//#region CELL CLICK
 $body.addEventListener("click", (event) => {
   const td = event.target.closest("td");
   if (!td) return;
@@ -38,16 +38,23 @@ $body.addEventListener("click", (event) => {
     return;
   }
 
+  // Selection
   removeSelection();
   td.classList.add("selected");
   const { x, y } = td.dataset;
   selection.column = x;
   selection.row = y;
+
+  // Formula Bar
   $formulaBar.value = STATE[x][y].value;
+  // Tool Bar
   updateToolBar(format);
   STATE[x][y].format = format;
 });
 
+//#endregion
+
+//#region CEL DOUBLE CLICK
 $body.addEventListener("dblclick", (event) => {
   const td = event.target.closest("td");
   if (!td) return;
@@ -81,7 +88,9 @@ $body.addEventListener("dblclick", (event) => {
     { once: true }
   );
 });
+//#endregion
 
+//#region C-HEADER CLICK
 $head.addEventListener("click", (event) => {
   const th = event.target.closest("th");
   if (!th) return;
@@ -100,6 +109,9 @@ $head.addEventListener("click", (event) => {
   $formulaBar.value = "";
 });
 
+//#endregion
+
+//#region  DOM KEY DOWN
 document.addEventListener("keydown", (event) => {
   const isDeleteKey = event.key === "Backspace" || event.key === "Delete";
   const isColumnSelected = selection.column !== null && selection.row === null;
@@ -135,6 +147,9 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+//#endregion
+
+//#region DOM COPY
 document.addEventListener("copy", (event) => {
   const isColumnSelected = selection.column !== null && selection.row === null;
   const isRowSelected = selection.column === null && selection.row !== null;
@@ -164,7 +179,9 @@ document.addEventListener("copy", (event) => {
     event.preventDefault();
   }
 });
+//#endregion
 
+//#region DOM CLICK
 document.addEventListener("click", ({ target }) => {
   const isThClicked = target.closest("th");
   const isTdClicked = target.closest("td");
@@ -176,6 +193,9 @@ document.addEventListener("click", ({ target }) => {
   }
 });
 
+//#endregion
+
+//#region RENDER
 const renderTable = () => {
   const headerHTML = `
     <tr>
@@ -225,8 +245,9 @@ const updateCell = ({ x, y, value }) => {
 
   renderTable();
 };
+//#endregion
 
-//#region TOOL BAR
+//#region TOOL-BAR
 const updateToolBar = (format) => {
   // This isn't a text editor, that's way I don't do a better solution
   if (format === "bold") {
@@ -244,6 +265,8 @@ const updateToolBar = (format) => {
     $toggleItalic.classList.remove("toggle");
   }
 };
+
+//#region TOGGLE BUTTON
 
 //TODO: Refactor format
 $toggleBold.addEventListener("click", ({ target }) => {
