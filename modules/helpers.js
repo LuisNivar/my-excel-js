@@ -23,9 +23,16 @@ const computeValue = (value, constants) => {
   const formula = value.slice(1);
   let computedValue;
 
+  const excelFormulas = [
+    "const sum = (...args) => [...args].reduce((a, b) => a + b, 0);",
+    "const today = () => new Date(Date.now()).toLocaleDateString();",
+  ];
+
   try {
     computedValue = new Function(`
             ${constants}
+            ${excelFormulas.join("")}
+
             return ${formula}`)();
   } catch (e) {
     computedValue = "#ERROR!"; //+ e.message';
