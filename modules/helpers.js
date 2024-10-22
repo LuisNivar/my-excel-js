@@ -3,18 +3,17 @@ import { range, getElements } from "./utils.js";
 
 function generateState() {
   return range(COLUNMS).map((_) =>
-    range(ROWS).map((_) => ({ computedValue: "", value: 0 }))
+    range(ROWS).map((_) => ({ computedValue: "", value: "" }))
   );
 }
 //TODO: Excel column notation -> X,Y,Z,AA,AB...
 const getColumnLetter = (i) => String.fromCharCode(i + FIRST_LETTER_ASCII_CODE);
 
 const computeValue = (value, constants) => {
-  const isNumber = typeof value === "number";
-  const isEmpty = value === 0;
-
-  if (isEmpty) return "";
-  if (isNumber) return value;
+  const isEmpty = value === 0 || value.trim() === "";
+  if (isEmpty) {
+    return "";
+  }
 
   const isFormula = value.startsWith("=") || value.startsWith("+");
   if (!isFormula) {
@@ -24,12 +23,19 @@ const computeValue = (value, constants) => {
   const formula = value.slice(1);
   let computedValue;
 
+  const excelFormulas = [
+    "const sum = (...args) => [...args].reduce((a, b) => a + b, 0);",
+    "const today = () => new Date(Date.now()).toLocaleDateString();",
+  ];
+
   try {
     computedValue = new Function(`
             ${constants}
+            ${excelFormulas.join("")}
+
             return ${formula}`)();
   } catch (e) {
-    computedValue = "!ERROR"; //+ e.message';
+    computedValue = "#ERROR!"; //+ e.message';
   }
 
   return computedValue;
@@ -63,8 +69,24 @@ const generateConstantsCell = (cols) => {
           const letter = getColumnLetter(x);
           const cellRef = `${letter.toLowerCase()}${y + 1}`; // Like A1, C15...
 
-          const computedValue =
-            cell.computedValue === "" ? 0 : cell.computedValue;
+          let computedValue;
+
+          const isString = isNaN(cell.computedValue);
+          const isNumber = !isString;
+          const isEmpty = cell.computedValue === "";
+
+          if (isString) {
+            computedValue = `"${cell.computedValue}"`;
+          }
+
+          if (isEmpty) {
+            computedValue = "";
+          }
+
+          if (isNumber) {
+            computedValue = Number(cell.computedValue);
+          }
+
           return `const ${cellRef} = ${computedValue};`; // Like const A1 = 15...
         })
         .join("\n");

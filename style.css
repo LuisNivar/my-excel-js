@@ -22,7 +22,8 @@
     left: 0;
     width: 32px;
     white-space: nowrap;
-   background-color:  #eee;
+    background-color:  #eee;
+    z-index: 10;
  }
 
 
@@ -36,7 +37,7 @@
     font-size: 14px;
     cursor: default;
     text-align: center;
-    width: 72px;
+    width: 84px;
     height: 24px;
     position: relative;
     vertical-align: middle;
@@ -101,7 +102,6 @@ header {
     border-radius: 6px;
     height: 48px;
     cursor: default;
-    /* border-bottom: 1px solid #eee; */ 
 }
 
 .formula-bar {
@@ -148,20 +148,6 @@ header {
         font-size: small;
     }
 }
-
-/* [data-tooltip]:hover::after {
-    display: block;
-    position: absolute;
-    z-index: 99;
-    top : 28px;
-    content: attr(data-tooltip);
-    border: 1px solid #bbb;
-    background: #444;
-    color : #ddd;
-    font-size: 12px;
-    border-radius: 4px;
-    padding: .25em;
-  } */
 
 
 
