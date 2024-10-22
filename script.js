@@ -16,14 +16,19 @@ const $table = getElement(".main-table");
 const $head = getElement(".head-table");
 const $body = getElement(".body-table");
 const $formulaBar = getElement("#formula-bar");
+const $toggleBold = getElement(".bold");
+const $toggleItalic = getElement(".italic");
 
 // Get td
 $body.addEventListener("click", (event) => {
   const td = event.target.closest("td");
   if (!td) return;
 
+  const { format } = td.dataset;
   const tr = td.parentNode;
   const indexColumn = [...tr.children].indexOf(td);
+
+  updateToolBar(format);
 
   if (indexColumn === 0) {
     const rows = [...tr.children];
@@ -71,7 +76,7 @@ $body.addEventListener("dblclick", (event) => {
         return;
       }
 
-      updateCell({ x, y, value: $input.value.toLowerCase() });
+      updateCell({ x, y, value: $input.value });
     },
     { once: true }
   );
@@ -163,8 +168,9 @@ document.addEventListener("copy", (event) => {
 document.addEventListener("click", ({ target }) => {
   const isThClicked = target.closest("th");
   const isTdClicked = target.closest("td");
+  const isToolBarClicked = target.closest(".tool-bar");
 
-  if (!isThClicked && !isTdClicked) {
+  if (!isThClicked && !isTdClicked && !isToolBarClicked) {
     removeSelection();
     $formulaBar.value = "";
   }
@@ -189,7 +195,7 @@ const renderTable = () => {
             ${range(COLUNMS)
               .map(
                 (col) => `
-                <td data-x="${col}" data-y="${row}">
+                <td data-x="${col}" data-y="${row}" data-format="normal">
                   	<span>${STATE[col][row].computedValue}</span> 
                     <input type="text" name="${col}-${row}" value="${STATE[col][row].value}" />
                 </td>`
@@ -219,5 +225,61 @@ const updateCell = ({ x, y, value }) => {
 
   renderTable();
 };
+
+//#region TOOL BAR
+const updateToolBar = (format) => {
+  // This isn't a text editor, that's way I don't do a better solution
+  if (format === "bold") {
+    $toggleBold.classList.add("toggle");
+    $toggleItalic.classList.remove("toggle");
+  }
+
+  if (format === "italic") {
+    $toggleItalic.classList.add("toggle");
+    $toggleBold.classList.remove("toggle");
+  }
+
+  if (format === "normal") {
+    $toggleBold.classList.remove("toggle");
+    $toggleItalic.classList.remove("toggle");
+  }
+};
+
+$toggleBold.addEventListener("click", ({ target }) => {
+  const { column, row } = selection;
+  if (!column && !row) return;
+
+  const td = $body.querySelector(`td[data-x="${column}"][data-y="${row}"]`);
+  const format = td.dataset.format;
+
+  if (format !== "normal") {
+    target.classList.remove("toggle");
+    td.dataset.format = "normal";
+  } else {
+    target.classList.add("toggle");
+    td.dataset.format = "bold";
+  }
+
+  $toggleItalic.classList.remove("toggle");
+});
+
+$toggleItalic.addEventListener("click", ({ target }) => {
+  const { column, row } = selection;
+  if (!column && !row) return;
+
+  const td = $body.querySelector(`td[data-x="${column}"][data-y="${row}"]`);
+  const format = td.dataset.format;
+
+  if (format !== "normal") {
+    target.classList.remove("toggle");
+    td.dataset.format = "normal";
+  } else {
+    target.classList.add("toggle");
+    td.dataset.format = "italic";
+  }
+  $toggleBold.classList.remove("toggle");
+});
+
+//#endregion
 
 renderTable();
