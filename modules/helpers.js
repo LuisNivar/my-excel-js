@@ -3,7 +3,7 @@ import { range, getElements } from "./utils.js";
 
 function generateState() {
   return range(COLUNMS).map((_) =>
-    range(ROWS).map((_) => ({ computedValue: "", value: "" }))
+    range(ROWS).map((_) => ({ computedValue: "", value: "", format: "normal" }))
   );
 }
 //TODO: Excel column notation -> X,Y,Z,AA,AB...
@@ -28,12 +28,14 @@ const computeValue = (value, constants) => {
     "const today = () => new Date(Date.now()).toLocaleDateString();",
   ];
 
+  const formulaFormated = formula.toLowerCase();
+
   try {
     computedValue = new Function(`
             ${constants}
             ${excelFormulas.join("")}
 
-            return ${formula}`)();
+            return ${formulaFormated}`)();
   } catch (e) {
     computedValue = "#ERROR!"; //+ e.message';
   }
