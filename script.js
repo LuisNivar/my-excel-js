@@ -96,12 +96,14 @@ $head.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  const isBackSpace = event.key === "Backspace";
+  const isDeleteKey = event.key === "Backspace" || event.key === "Delete";
   const isColumnSelected = selection.column !== null && selection.row === null;
   const isRowSelected = selection.column === null && selection.row !== null;
-  const isCellSelected = !isColumnSelected && !isRowSelected;
+  const isNothingSelected = selection.column === null && selection.row === null;
+  const isCellSelected =
+    !isColumnSelected && !isRowSelected && !isNothingSelected;
 
-  if (isBackSpace && isColumnSelected) {
+  if (isDeleteKey && isColumnSelected) {
     range(ROWS).forEach((row) => {
       updateCell({ x: selection.column, y: row, value: 0 });
     });
@@ -110,7 +112,7 @@ document.addEventListener("keydown", (event) => {
     $formulaBar.value = "";
   }
 
-  if (isBackSpace && isRowSelected) {
+  if (isDeleteKey && isRowSelected) {
     range(COLUNMS).forEach((colmn) => {
       updateCell({ x: colmn, y: selection.row, value: 0 });
     });
@@ -119,7 +121,7 @@ document.addEventListener("keydown", (event) => {
     $formulaBar.value = "";
   }
 
-  if (isBackSpace && isCellSelected) {
+  if (isDeleteKey && isCellSelected) {
     updateCell({ x: selection.column, y: selection.row, value: 0 });
     renderTable();
     selection.column = null;
