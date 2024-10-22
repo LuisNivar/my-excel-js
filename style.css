@@ -43,6 +43,9 @@
     vertical-align: middle;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    -webkit-user-select: none; 
+    user-select: none; 
 }
 
 .main-table th.selected,  .main-table tr td.selected:first-child {
