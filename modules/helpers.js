@@ -28,12 +28,14 @@ const computeValue = (value, constants) => {
     "const today = () => new Date(Date.now()).toLocaleDateString();",
   ];
 
+  const formulaFormated = formula.toLowerCase();
+
   try {
     computedValue = new Function(`
             ${constants}
             ${excelFormulas.join("")}
 
-            return ${formula}`)();
+            return ${formulaFormated}`)();
   } catch (e) {
     computedValue = "#ERROR!"; //+ e.message';
   }
