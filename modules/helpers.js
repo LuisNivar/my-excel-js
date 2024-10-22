@@ -3,7 +3,7 @@ import { range, getElements } from "./utils.js";
 
 function generateState() {
   return range(COLUNMS).map((_) =>
-    range(ROWS).map((_) => ({ computedValue: "", value: "" }))
+    range(ROWS).map((_) => ({ computedValue: "", value: "", format: "normal" }))
   );
 }
 //TODO: Excel column notation -> X,Y,Z,AA,AB...

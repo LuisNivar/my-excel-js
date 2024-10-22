@@ -28,8 +28,6 @@ $body.addEventListener("click", (event) => {
   const tr = td.parentNode;
   const indexColumn = [...tr.children].indexOf(td);
 
-  updateToolBar(format);
-
   if (indexColumn === 0) {
     const rows = [...tr.children];
     removeSelection();
@@ -46,6 +44,8 @@ $body.addEventListener("click", (event) => {
   selection.column = x;
   selection.row = y;
   $formulaBar.value = STATE[x][y].value;
+  updateToolBar(format);
+  STATE[x][y].format = format;
 });
 
 $body.addEventListener("dblclick", (event) => {
@@ -195,7 +195,7 @@ const renderTable = () => {
             ${range(COLUNMS)
               .map(
                 (col) => `
-                <td data-x="${col}" data-y="${row}" data-format="normal">
+                <td data-x="${col}" data-y="${row}" data-format="${STATE[col][row].format}">
                   	<span>${STATE[col][row].computedValue}</span> 
                     <input type="text" name="${col}-${row}" value="${STATE[col][row].value}" />
                 </td>`
@@ -245,6 +245,7 @@ const updateToolBar = (format) => {
   }
 };
 
+//TODO: Refactor format
 $toggleBold.addEventListener("click", ({ target }) => {
   const { column, row } = selection;
   if (!column && !row) return;
@@ -255,9 +256,11 @@ $toggleBold.addEventListener("click", ({ target }) => {
   if (format !== "normal") {
     target.classList.remove("toggle");
     td.dataset.format = "normal";
+    STATE[column][row].format = td.dataset.format;
   } else {
     target.classList.add("toggle");
     td.dataset.format = "bold";
+    STATE[column][row].format = td.dataset.format;
   }
 
   $toggleItalic.classList.remove("toggle");
@@ -273,10 +276,13 @@ $toggleItalic.addEventListener("click", ({ target }) => {
   if (format !== "normal") {
     target.classList.remove("toggle");
     td.dataset.format = "normal";
+    STATE[column][row].format = td.dataset.format;
   } else {
     target.classList.add("toggle");
     td.dataset.format = "italic";
+    STATE[column][row].format = td.dataset.format;
   }
+
   $toggleBold.classList.remove("toggle");
 });
 
