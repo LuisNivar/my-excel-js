@@ -46,12 +46,27 @@ const computeValue = (value, constants) => {
 const selection = {
   column: null,
   row: null,
+  get isColumnSelected() {
+    return this.column !== null && this.row === null;
+  },
+  get isRowSelected() {
+    return this.column === null && this.row !== null;
+  },
+  get isEmpty() {
+    return this.column === null && this.row === null;
+  },
+  get isCellSelected() {
+    return !this.isColumnSelected && !this.isRowSelected && !this.isEmpty;
+  },
+  clear() {
+    this.column = null;
+    this.row = null;
+  },
 };
 
 function removeSelection() {
   getElements(".selected").forEach((el) => el.classList.remove("selected"));
-  selection.column = null;
-  selection.row = null;
+  selection.clear();
 }
 
 const computeAllCells = (cells, constants) => {

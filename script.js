@@ -114,13 +114,8 @@ $head.addEventListener("click", (event) => {
 //#region  DOM KEY DOWN
 document.addEventListener("keydown", (event) => {
   const isDeleteKey = event.key === "Backspace" || event.key === "Delete";
-  const isColumnSelected = selection.column !== null && selection.row === null;
-  const isRowSelected = selection.column === null && selection.row !== null;
-  const isNothingSelected = selection.column === null && selection.row === null;
-  const isCellSelected =
-    !isColumnSelected && !isRowSelected && !isNothingSelected;
 
-  if (isDeleteKey && isColumnSelected) {
+  if (isDeleteKey && selection.isColumnSelected) {
     range(ROWS).forEach((row) => {
       updateCell({ x: selection.column, y: row, value: 0 });
     });
@@ -129,7 +124,7 @@ document.addEventListener("keydown", (event) => {
     $formulaBar.value = "";
   }
 
-  if (isDeleteKey && isRowSelected) {
+  if (isDeleteKey && selection.isRowSelected) {
     range(COLUNMS).forEach((colmn) => {
       updateCell({ x: colmn, y: selection.row, value: 0 });
     });
@@ -138,11 +133,10 @@ document.addEventListener("keydown", (event) => {
     $formulaBar.value = "";
   }
 
-  if (isDeleteKey && isCellSelected) {
+  if (isDeleteKey && selection.isCellSelected) {
     updateCell({ x: selection.column, y: selection.row, value: 0 });
     renderTable();
-    selection.column = null;
-    selection.row = null;
+    selection.clear();
     $formulaBar.value = "";
   }
 });
@@ -151,11 +145,7 @@ document.addEventListener("keydown", (event) => {
 
 //#region DOM COPY
 document.addEventListener("copy", (event) => {
-  const isColumnSelected = selection.column !== null && selection.row === null;
-  const isRowSelected = selection.column === null && selection.row !== null;
-  const isCellSelected = !isColumnSelected && !isRowSelected;
-
-  if (isColumnSelected) {
+  if (selection.isColumnSelected) {
     const columnValues = range(ROWS).map((row) => {
       return STATE[selection.column][row].computedValue;
     });
@@ -164,7 +154,7 @@ document.addEventListener("copy", (event) => {
     event.preventDefault();
   }
 
-  if (isRowSelected) {
+  if (selection.isRowSelected) {
     const rowValues = range(COLUNMS).map((column) => {
       return STATE[column][selection.row].computedValue;
     });
@@ -173,7 +163,7 @@ document.addEventListener("copy", (event) => {
     event.preventDefault();
   }
 
-  if (isCellSelected) {
+  if (selection.isCellSelected) {
     const cellValue = STATE[selection.column][selection.row].computedValue;
     event.clipboardData.setData("text/plain", cellValue);
     event.preventDefault();
@@ -183,11 +173,7 @@ document.addEventListener("copy", (event) => {
 
 //#region DOM PASTE
 document.addEventListener("paste", (event) => {
-  const isColumnSelected = selection.column !== null && selection.row === null;
-  const isRowSelected = selection.column === null && selection.row !== null;
-  const isCellSelected = !isColumnSelected && !isRowSelected;
-
-  if (isColumnSelected) {
+  if (selection.isColumnSelected) {
     const values = event.clipboardData.getData("text/plain").split("\n");
     range(ROWS).forEach((row) => {
       updateCell({ x: selection.column, y: row, value: values[row] });
@@ -195,7 +181,7 @@ document.addEventListener("paste", (event) => {
     event.preventDefault();
   }
 
-  if (isRowSelected) {
+  if (selection.isRowSelected) {
     const values = event.clipboardData.getData("text/plain").split(";");
     range(COLUNMS).forEach((column) => {
       updateCell({ x: column, y: selection.row, value: values[column] });
@@ -203,7 +189,7 @@ document.addEventListener("paste", (event) => {
     event.preventDefault();
   }
 
-  if (isCellSelected) {
+  if (selection.isCellSelected) {
     const value = event.clipboardData.getData("text/plain");
     updateCell({ x: selection.column, y: selection.row, value });
     event.preventDefault();
@@ -300,45 +286,41 @@ const updateToolBar = (format) => {
 
 //TODO: Refactor format
 $toggleBold.addEventListener("click", ({ target }) => {
-  const { column, row } = selection;
-  if (!column && !row) return;
+  if (selection.isEmpty) return;
 
-  const td = $body.querySelector(`td[data-x="${column}"][data-y="${row}"]`);
-  const format = td.dataset.format;
+  //TODO: Allow add format to whole Rows and Columns
+  if (selection.isColumnSelected || selection.isRowSelected) return;
 
-  if (format !== "normal") {
-    target.classList.remove("toggle");
-    td.dataset.format = "normal";
-    STATE[column][row].format = td.dataset.format;
-  } else {
-    target.classList.add("toggle");
-    td.dataset.format = "bold";
-    STATE[column][row].format = td.dataset.format;
-  }
-
+  applyFormat(target, "bold");
   $toggleItalic.classList.remove("toggle");
 });
 
 $toggleItalic.addEventListener("click", ({ target }) => {
+  if (selection.isEmpty) return;
+
+  //TODO: Allow add format to whole Rows and Columns
+  if (selection.isColumnSelected || selection.isRowSelected) return;
+
+  applyFormat(target, "italic");
+  $toggleBold.classList.remove("toggle");
+});
+
+const applyFormat = (target, format) => {
   const { column, row } = selection;
-  if (!column && !row) return;
 
   const td = $body.querySelector(`td[data-x="${column}"][data-y="${row}"]`);
-  const format = td.dataset.format;
+  const oldFormat = td.dataset.format;
 
-  if (format !== "normal") {
+  if (oldFormat !== "normal") {
     target.classList.remove("toggle");
     td.dataset.format = "normal";
     STATE[column][row].format = td.dataset.format;
   } else {
     target.classList.add("toggle");
-    td.dataset.format = "italic";
+    td.dataset.format = format;
     STATE[column][row].format = td.dataset.format;
   }
-
-  $toggleBold.classList.remove("toggle");
-});
-
+};
 //#endregion
 
 renderTable();
