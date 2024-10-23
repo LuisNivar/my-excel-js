@@ -35,7 +35,6 @@
     border: 1px solid #bbb;
     font-weight: normal;
     font-size: 14px;
-    cursor: default;
     text-align: center;
     width: 84px;
     height: 24px;
@@ -69,20 +68,29 @@
     align-items: center;
 }
 
+.main-table td span {
+    cursor: cell;
+}
 
-.main-table input {
+.main-table td input {
     width: 100%;
     border: none;
     border-radius: 2px;
+    padding: 2px 4px;
     opacity: 0;
     pointer-events: none;
+    z-index: 11;
 
     &:focus {
         opacity: 1;
         outline: 2px solid#19c0cc;
+        pointer-events: all;
+    }
+    &::selection {
+        color: white;
+        background: #19c0cc;
     }
 }
-
 
 body {
     padding: 16px 32px;
@@ -144,6 +152,8 @@ header {
         text-align: center;
         vertical-align: middle;
     }
+
+
     & span {
         padding: 4px 8px;
         border-radius: 12px;
@@ -153,6 +163,14 @@ header {
     }
 }
 
+@media only screen and (max-width: 600px) {
+    .logo h1 {
+        display: none;
+    }
+    .formula-bar input {
+        max-width: 70px;
+    }
+}
 
 td[data-format="bold"] span {
     font-weight: bold;
