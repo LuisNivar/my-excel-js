@@ -181,6 +181,36 @@ document.addEventListener("copy", (event) => {
 });
 //#endregion
 
+//#region DOM PASTE
+document.addEventListener("paste", (event) => {
+  const isColumnSelected = selection.column !== null && selection.row === null;
+  const isRowSelected = selection.column === null && selection.row !== null;
+  const isCellSelected = !isColumnSelected && !isRowSelected;
+
+  if (isColumnSelected) {
+    const values = event.clipboardData.getData("text/plain").split("\n");
+    range(ROWS).forEach((row) => {
+      updateCell({ x: selection.column, y: row, value: values[row] });
+    });
+    event.preventDefault();
+  }
+
+  if (isRowSelected) {
+    const values = event.clipboardData.getData("text/plain").split(";");
+    range(COLUNMS).forEach((column) => {
+      updateCell({ x: column, y: selection.row, value: values[column] });
+    });
+    event.preventDefault();
+  }
+
+  if (isCellSelected) {
+    const value = event.clipboardData.getData("text/plain");
+    updateCell({ x: selection.column, y: selection.row, value });
+    event.preventDefault();
+  }
+});
+//#endregion
+
 //#region DOM CLICK
 document.addEventListener("click", ({ target }) => {
   const isThClicked = target.closest("th");
