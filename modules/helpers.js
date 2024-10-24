@@ -20,7 +20,7 @@ const computeValue = (value, constants) => {
     return value;
   }
 
-  const formula = value.slice(1);
+  let formula = value.slice(1);
   let computedValue;
 
   const excelFormulas = [
@@ -28,13 +28,22 @@ const computeValue = (value, constants) => {
     "const today = () => new Date(Date.now()).toLocaleDateString();",
   ];
 
+  const rangePattern = /[a-zA-Z]\d:[a-zA-Z]\d/;
+  const hasRange = rangePattern.test(formula);
+
+  if (hasRange) {
+    const rangeCells = formula.match(rangePattern)[0];
+    const rangeConst = range2Consts(rangeCells);
+    formula = formula.replace(rangePattern, rangeConst);
+  }
+
   const formulaFormated = formula.toLowerCase();
 
   try {
     computedValue = new Function(`
             ${constants}
-            ${excelFormulas.join("")}
-
+            ${excelFormulas.join("\n")}
+            
             return ${formulaFormated}`)();
   } catch (e) {
     computedValue = "#ERROR!"; //+ e.message';
@@ -68,6 +77,32 @@ function removeSelection() {
   getElements(".selected").forEach((el) => el.classList.remove("selected"));
   selection.clear();
 }
+
+const range2Consts = (rangeCells) => {
+  const start = /(?<column>[a-zA-Z])(?<row>\d)(?=:)/.exec(rangeCells).groups;
+  const end = /(?<=:)(?<column>[a-zA-Z])(?<row>\d)/.exec(rangeCells).groups;
+
+  const startRow = Number(start.row);
+  const endRow = Number(end.row);
+
+  const startColum =
+    start.column.toUpperCase().charCodeAt(0) - FIRST_LETTER_ASCII_CODE;
+
+  const endColum =
+    end.column.toUpperCase().charCodeAt(0) - FIRST_LETTER_ASCII_CODE;
+
+  let arrayCells = [];
+  for (let j = startColum; j < endColum + 1; j++) {
+    const letter = getColumnLetter(j);
+
+    for (let i = startRow; i < endRow + 1; i++) {
+      arrayCells.push(letter + i);
+    }
+  }
+
+  const result = arrayCells.join(",");
+  return result;
+};
 
 const computeAllCells = (cells, constants) => {
   cells.forEach((rows, x) => {
