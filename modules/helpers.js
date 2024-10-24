@@ -24,8 +24,38 @@ const computeValue = (value, constants) => {
   let computedValue;
 
   const excelFormulas = [
-    "const sum = (...args) => [...args].reduce((a, b) => a + b, 0);",
-    "const today = () => new Date(Date.now()).toLocaleDateString();",
+    `function sum(...args) {
+      let result = 0;
+      if ([...args].length === 0) return 0;
+      for (const arg of [...args]) {
+        const n = isNaN(arg) ? 0 : arg;
+        result += n;
+      }
+      return result;
+    }`,
+    `function average(...args) {
+    const n = [...args].length;
+    const result = sum(...args)/n;
+    return result;
+  }`,
+    `function today(){
+    const now = new Date(Date.now());
+    return now.toLocaleDateString();
+  }`,
+    `  function max(...args){
+    return Math.max(...args);
+  }`,
+    ` function min(...args){
+    return Math.min(...args);
+  }`,
+    ` function concat(...args){
+    if ([...args].length === 0) return "";
+    let result = "";
+    for (const arg of [...args]) {
+      result += arg;
+    }
+    return result;
+  }`,
   ];
 
   const rangePattern = /[a-zA-Z]\d:[a-zA-Z]\d/;
@@ -46,7 +76,12 @@ const computeValue = (value, constants) => {
             
             return ${formulaFormated}`)();
   } catch (e) {
-    computedValue = "#ERROR!"; //+ e.message';
+    computedValue = "#ERROR!"; // + e.message;
+  }
+
+  // One Decimal place
+  if (!isNaN(computedValue)) {
+    computedValue = Math.round(computedValue * 10) / 10;
   }
 
   return computedValue;
