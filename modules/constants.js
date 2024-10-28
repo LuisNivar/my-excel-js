@@ -1,5 +1,5 @@
 const FIRST_LETTER_ASCII_CODE = 65;
-const ROWS = 18;
+const ROWS = 17;
 const COLUNMS = 22;
 const DIAGONAL_ARROW = "&#129126";
 
