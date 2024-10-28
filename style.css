@@ -47,6 +47,21 @@
     user-select: none; 
 }
 
+.main-table .head-table th {
+    position: relative;
+
+& .resizer{
+    position: absolute;
+    display: block;
+    top:0;
+    right:0; 
+    width: 8px;
+    cursor: col-resize;
+    height: 100%;
+    background-color: transparent;
+}
+}
+
 .main-table th.selected,  .main-table tr td.selected:first-child {
     background-color: #19c0cc;
     border: 1px solid #19c0cc;
@@ -59,7 +74,7 @@
     border: 1px solid #19c0cc;
 }
 
-.main-table span, .main-table input {
+.main-table td span, .main-table input {
     position: absolute;
     display: inline-flex;
     inset: 0;
@@ -205,6 +220,3 @@ td[data-format="italic"] span {
         font-style: italic;
     }
 }
-
-
-
