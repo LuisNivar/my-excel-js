@@ -19,7 +19,7 @@ It's a basic clone of excel.
 
 ## Try it
 
-You can try my-asteroid online at [my-excel-js](https://my-excel-js-luis-nivar.vercel.app). 
+You can try it online at [my-excel-js](https://my-excel-js-luis-nivar.vercel.app). 
 
 ## Built With
 
