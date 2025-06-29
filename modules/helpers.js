@@ -3,9 +3,20 @@ import { range, getElements } from "./utils.js";
 
 function generateState() {
   return range(COLUNMS).map((_) =>
-    range(ROWS).map((_) => ({ computedValue: "", value: "", format: "normal" }))
+    range(ROWS).map((_) => ({
+      computedValue: "",
+      value: "",
+      format: "normal",
+    }))
   );
 }
+
+function generateHeaders() {
+  return range(COLUNMS).map((_) => ({
+    width: "84px",
+  }));
+}
+
 //TODO: Excel column notation -> X,Y,Z,AA,AB...
 const getColumnLetter = (i) => String.fromCharCode(i + FIRST_LETTER_ASCII_CODE);
 
@@ -189,4 +200,5 @@ export {
   removeSelection,
   generateConstantsCell,
   computeAllCells,
+  generateHeaders,
 };
