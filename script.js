@@ -7,10 +7,12 @@ import {
   removeSelection,
   generateConstantsCell,
   computeAllCells,
+  generateHeaders,
 } from "./modules/helpers.js";
 import { ROWS, COLUNMS, DIAGONAL_ARROW } from "./modules/constants.js";
 
 let STATE = generateState();
+let HEADERS = generateHeaders();
 
 const $table = getElement(".main-table");
 const $head = getElement(".head-table");
@@ -218,7 +220,12 @@ const renderTable = () => {
         <th>${DIAGONAL_ARROW}</th>
         ${range(COLUNMS)
           .map(
-            (i) => `<th>${getColumnLetter(i)}<span class="resizer"></span></th>`
+            (i) =>
+              `<th style="width:${
+                HEADERS[i].width
+              };" data-column="${i}">${getColumnLetter(
+                i
+              )}<span class="resizer"></span></th>`
           )
           .join("")}
     </tr>`;
@@ -244,6 +251,7 @@ const renderTable = () => {
     .join("");
 
   $body.innerHTML = bodyHtml;
+  addResizers();
 };
 
 const updateCell = ({ x, y, value }) => {
@@ -324,29 +332,37 @@ const applyFormat = (target, format) => {
   }
 };
 //#endregion
-renderTable();
 
 //#region RESIZE
-const $resizers = getElements(".resizer");
 
-$resizers.forEach((resizer) => {
-  resizer.addEventListener("mousedown", (e) => {
-    const th = e.target.parentElement;
-    const startX = e.clientX;
-    const startWidth = th.offsetWidth;
+function addResizers() {
+  const $resizers = getElements(".resizer");
 
-    const mouseMoveHandler = (e) => {
-      const newWidth = startWidth + (e.clientX - startX);
-      th.style.width = newWidth + "px";
-    };
+  $resizers.forEach((resizer) => {
+    resizer.addEventListener("mousedown", (e) => {
+      const th = e.target.parentElement;
+      const startX = e.clientX;
+      const startWidth = th.offsetWidth;
 
-    const mouseUpHandler = () => {
-      document.removeEventListener("mousemove", mouseMoveHandler);
-      document.removeEventListener("mouseup", mouseUpHandler);
-    };
+      const mouseMoveHandler = (e) => {
+        const newWidth = startWidth + (e.clientX - startX);
+        const { column } = th.dataset;
 
-    document.addEventListener("mousemove", mouseMoveHandler);
-    document.addEventListener("mouseup", mouseUpHandler);
+        HEADERS[column].width = newWidth + "px";
+        th.style.width = newWidth + "px";
+      };
+
+      const mouseUpHandler = () => {
+        document.removeEventListener("mousemove", mouseMoveHandler);
+        document.removeEventListener("mouseup", mouseUpHandler);
+      };
+
+      document.addEventListener("mousemove", mouseMoveHandler);
+      document.addEventListener("mouseup", mouseUpHandler);
+    });
   });
-});
+}
+
+renderTable();
+
 //#endregion
